@@ -48,3 +48,6 @@ matlab_runners/Head Pose Experiments/experiments/biwi_out/
 matlab_runners/Head Pose Experiments/experiments/bu_out/
 matlab_runners/Head Pose Experiments/experiments/ict_out/
 *~
+*.aux
+*.out
+*.log

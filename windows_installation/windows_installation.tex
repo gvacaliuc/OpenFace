@@ -1,0 +1,318 @@
+\documentclass{tufte-handout}
+
+%\geometry{showframe}% for debugging purposes -- displays the margins
+
+\usepackage{amsmath}
+
+% Set up the images/graphics package
+\usepackage{graphicx}
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+\graphicspath{{graphics/}}
+
+\title{Installing OpenFace from sources in Windows}
+\author{Gabriel Vacaliuc}
+%\date{24 January 2009}  % if the \date{} command is left out, the current date will be used
+
+% The following package makes prettier tables.  We're all about the bling!
+\usepackage{booktabs}
+
+% The units package provides nice, non-stacked fractions and better spacing
+% for units.
+\usepackage{units}
+
+% The fancyvrb package lets us customize the formatting of verbatim
+% environments.  We use a slightly smaller font.
+\usepackage{fancyvrb}
+\fvset{fontsize=\normalsize}
+
+% Small sections of multiple columns
+\usepackage{multicol}
+
+% Provides paragraphs of dummy text
+\usepackage{lipsum}
+
+% These commands are used to pretty-print LaTeX commands
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Bash,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\begin{document}
+
+\maketitle% this prints the handout title, author, and date
+
+\begin{abstract}
+    \noindent This document details the installtion of OpenFace\footnote{
+        https://github.com/TadasBaltrusaitis/OpenFace} in Windows 10 from source files, 
+    without relying on the Visual Studio IDE.
+\end{abstract}
+
+\section{Environment Setup}
+
+\subsection{CMake}
+
+CMake is a powerful build tool that will set up the correct makefiles for a slew of 
+setups/IDEs/compilers.  Likely the only change you'll have to make for everything in this guide 
+to work with your environment is the \Verb|-G| flag to CMake.
+
+\newthought{This document} will assume the use of CMake 3.8 (the latest as
+of compilation)\footnote{ However, any CMake $> 3.0$ or so should work fine.}  Navigate to the CMake 
+Download page\footnote{https://cmake.org/download/} and download the windows installer (*.msi). \\
+
+\newthought{During the installation}, make sure to elect to add the execuatable path to the System PATH
+for (at least) the your profile. \\
+
+\subsection{Git}
+
+It's likely you already have Git installed, but in the event you don't, navigate to Git client
+download page\footnote{https://git-scm.com/downloads} and download the 64-bit windows installer. \\
+
+\newthought{During the installation}, make sure to elect to add the execuatable path to the System PATH
+for (at least) the your profile. \\
+
+\subsection{Microsoft Visual C++ Build Tools}
+
+\newthought{To get a C/C++ compiler}, we'll install either the MSVC 2015 Build 
+Tools\footnote{http://landinghub.visualstudio.com/visual-cpp-build-tools} or the MSVC 2017 Build
+Tools\footnote{https://www.visualstudio.com/downloads/\#build-tools-for-visual-studio-2017}.
+Note that if you already have Visual Studio 2015/17 installed, these will likely have already
+been installed.  When installing, be sure to check the boxes to install the C++ compilers as well 
+as C++/CLI Support. \\ 
+
+\newthought{After the installation}, you should be able to navigate to the start menu and open both:
+\begin{itemize}
+    
+    \item Developer Command Prompt for VS 2015/17
+    \item x64 Native Tools Command Prompt for VS 2015/17
+
+\end{itemize}
+
+\section{Dependencies}
+
+\subsection{zlib}
+
+The first dependency to install is zlib\footnote{http://zlib.net}.  The sources can be downloaded
+from the URL to the right, making sure to download the *.zip. \\
+
+    \newthought{After downloading}, extract the files to the directory \Verb|C:\local\|.\footnote{
+    You may have to create this directory.}  This should result in a directory such as
+    \Verb|C:\local\zlib-1.x.x|.
+
+    \newthought{To build} our libraries, open an ``x64 Native Tools Command Prompt for VS 2015/17''
+    from the start menu, and navigate to your zlib directory and execute the following 
+    commands\footnote{Note that this guide uses \Verb|nmake| as its build tool, however cmake provides
+    generators for several IDEs, see output of \Verb|cmake -h| for details.}:
+
+    \begin{lstlisting}
+        mkdir build
+        cd build 
+        cmake .. -G "NMake Makefiles"
+        nmake
+    \end{lstlisting}
+
+    If everything worked correctly, you should have files \Verb|zlibd.lib|, \Verb|zlibd.dll| in
+    your build directory.  For convenience later, set some environment variables.  Assuming that
+    your zlib directory is \\
+    \Verb|C:\local\zlib-1.2.11|, set:
+
+    \begin{lstlisting}
+        set ZLIB_INCLUDE_DIR=C:\local\zlib-1.2.11
+        set ZLIB_LIBRARY=%ZLIB_INCLUDE_DIR%\build\zlibd.lib
+    \end{lstlisting}
+
+\subsection{libpng}
+
+    Our second dependency depends directly on zlib.  libpng can be downloaded from 
+    SourceForge\footnote{https://sourceforge.net/projects \\
+    /libpng/files/libpng16/1.6.29/}, making 
+    sure to download the *.zip file.
+
+    \newthought{After downloading}, extract the files to \Verb|C:\local\|.
+
+    \newthought{To build} libpng, either open an ``x64 Native Tools Command Prompt for VS 2015/17''
+    or use the existing Command Prompt from the previous step.  Navigate to the libpng directory:
+    \Verb|C:\local\lpng1629\|, and execute:
+
+    \begin{lstlisting}
+        mkdir build
+        cd build
+        cmake .. -DZLIB_LIBRARY=%ZLIB_LIBRARY% ^ 
+                 -DZLIB_INCLUDE_DIR=%ZLIB_INCLUDE_DIR% ^
+                 -G "NMake Makefiles"
+        mklink %ZLIB_INCLUDE_DIR%\zconf.h %ZLIB_INCLUDE_DIR%\zconf.h.in
+        nmake
+    \end{lstlisting}
+
+    \newthought{If successful}, you should the file \Verb|libpng16d.lib| in your build directory.
+    For convenience later, set the following environment variables:
+
+    \begin{lstlisting}
+        set PNG_INCLUDE_DIR=C:\local\lpng1629
+        set PNG_LIBRARY=%PNG_INCLUDE_DIR%\build\libpng16d.lib
+    \end{lstlisting}
+
+\subsection{libjpeg}
+
+    The final dependency we'll build, libjpeg,  is stored on 
+    github\footnote{https://github.com/stohrendorf/libjpeg-cmake.git}.
+
+    \newthought{To download and build}, execute the following in an ``x64 Native Tools Command
+    Prompt for VS 2015/17'' from \Verb|C:\local\|:
+
+    \begin{lstlisting}
+        git clone https://github.com/stohrendorf/libjpeg-cmake.git jpeg-9a
+        mkdir jpeg-9a\build
+        cd jpeg-9a\build
+        cmake .. -G "NMake Makefiles"
+        nmake
+    \end{lstlisting}
+
+    \newthought{If successful}, you should have the file \Verb|libjpeg.lib| in your build
+    directory.  For convenience later, set the following environment variables:
+
+    \begin{lstlisting}
+        set JPEG_INCLUDE_DIR=C:\local\jpeg-9a
+        set JPEG_LIBRARY=%JPEG_INCLUDE_DIR%\build\libjpeg.lib
+    \end{lstlisting}
+
+\subsection{OpenCV}
+
+    \newthought{Download} the OpenCV Windows installer from their SourceForge 
+    page\footnote{https://sourceforge.net/projects/\\ opencvlibrary/files/opencv-win/3.2.0/}.  Upon
+    download, run the exe and install the files to \Verb|C:\local\|.  For convenience later,
+    set the following environment variable in your Command Prompt:
+
+    \begin{lstlisting}
+        set OPENCV_DIR=C:\local\opencv\build\x64\vc14\lib
+    \end{lstlisting}
+
+\subsection{Boost}
+
+    \newthought{Download} the Boost Windows Setup from their SourceForge 
+    page\footnote{https://sourceforge.net/projects/boost/files/boost-binaries/1.59.0/}.  Opt for
+    the 64-bit version compiled with the latest version of MSVC (14.0).  The filename you download
+    should be:\\ \Verb|boost_1_59_0-msvc-14.0-64.exe|.\\  Upon download, run the executable, and 
+    have it install the files to \Verb|C:\local|.  For convenience later,
+    set the following environment variables in your Command Prompt:
+
+    \begin{lstlisting}
+        set BOOST_ROOT=C:\local\boost_1_59_0
+        set BOOST_LIBRARY_DIR=%BOOST_ROOT%\lib64-msvc-14.0
+    \end{lstlisting}
+
+\subsection{TBB}
+
+    \newthought{Download} the prebuilt Windows libraries from Intel's TBB release 
+    page\footnote{https://github.com/01org/tbb/releases}.  Be sure to download the file ending
+    in `*win.zip'.
+
+    \newthought{Extract} the contents of the downloaded Zip File to \Verb|C:\local|.  For
+    convenience later, assuming that your extracted TBB directory is: \\
+    \Verb|C:\local\tbb2017_20170412oss| \\
+    set the following environment variables:
+
+    \begin{lstlisting}
+        set TBB_ROOT_DIR=C:\local\tbb2017_20170412oss
+        set TBB_LIBRARY=%TBB_ROOT_DIR%\lib\intel64\vc14\tbb.lib
+        set TBB_INCLUDE_DIR=%TBB_ROOT_DIR%\include
+    \end{lstlisting}
+        
+\section{OpenFace Installation}
+
+    \subsection{Header Fixing}
+        
+        Changes in libpng / libjpeg have changed up what some header files are called.  In order
+        to compile correctly we need to ``spoof'' them.  We'll do this by symlinking their old
+        names to their new names.  Assuming we have our environment variables set up, simply 
+        execute the commands:
+
+        \begin{lstlisting}
+            mklink %PNG_INCLUDE_DIR%\pnglibconf.h %PNG_INCLUDE_DIR%\scripts\pnglibconf.h.prebuilt
+
+        \end{lstlisting}
+
+    \subsection{Installation Proper}
+
+    With all the dependencies in place, we can compile the OpenFace project.  Working
+    either in the original repository\footnote{https://github.com/TadasBaltrusaitis/OpenFace} or 
+    the forked repository\footnote{https://github.com/gvacaliuc/OpenFace} I'm providing,
+    execute the following commands:
+
+    \begin{lstlisting}
+        mkdir build
+        cd build
+        # if using gvacaliuc/OpenFace
+        ../build.bat
+        # else using TadasB/OpenFace
+        cmake .. ^
+                -DOpenCV_DIR=%OPENCV_DIR% ^
+                -DTBB_ROOT_DIR=%TBB_ROOT_DIR% ^
+                -DTBB_LIBRARY=%TBB_LIBRARY% ^
+                -DTBB_INCLUDE_DIR=%TBB_INCLUDE% ^
+                -DZLIB_LIBRARY=%ZLIB_LIBRARY% ^
+                -DZLIB_INCLUDE_DIR=%ZLIB_INCLUDE_DIR% ^
+                -DPNG_PNG_INCLUDE_DIR=%PNG_INCLUDE_DIR% ^
+                -DPNG_LIBRARY=%PNG_LIBRARY% ^
+                -DJPEG_INCLUDE_DIR=%JPEG_INCLUDE_DIR% ^
+                -DJPEG_LIBRARY=%JPEG_LIBRARY% ^
+                -DCMAKE_BUILD_TYPE=Release ^
+                -G "NMake Makefiles"
+        nmake
+    \end{lstlisting}
+
+    \newthought{Note} that the above commands assume that you've preserved the same Command
+    Prompt that we defined the environment variables in.  Note also that you must perform this
+    compilation in an ``x64 Native Tools Command Prompt for VS 2015/17'', not a regular Developer
+    Command Prompt.
+
+\section{Running the Executables}
+
+    The executables that this guide builds has a few DLL dependencies that Windows needs to
+    be aware of.  In the Command Prompt you just built OpenFace in, update the \Verb|%PATH%|
+    environment variable to include the OpenCV DLL, Boost DLL's, and the TBB DLL:
+
+    \begin{lstlisting}
+        set TMP_OPENCV=%OPENCV_DIR%\..
+        set PATH=%PATH%;%TBB_ROOT_DIR%\bin\intel64\vc14
+        set PATH=%PATH%;%BOOST_LIBRARY_DIR%
+        set PATH=%PATH%;%TMP_OPENCV%\bin;
+    \end{lstlisting}
+   
+    \break
+
+    \newthought{After updating} the path, you should be able to run the executables from the 
+    \Verb|build\bin\Release| subdirectory like:
+
+    \begin{lstlisting}
+        ...\build\bin\Release> ..\FaceLandMarkImg.exe -root . -gaze -f input.png -oi output.png
+    \end{lstlisting}
+
+\end{document}
