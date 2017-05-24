@@ -51,3 +51,4 @@ matlab_runners/Head Pose Experiments/experiments/ict_out/
 *.aux
 *.out
 *.log
+*.swp
