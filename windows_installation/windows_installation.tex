@@ -100,18 +100,17 @@ for (at least) the your profile. \\
 
 \subsection{Microsoft Visual C++ Build Tools}
 
-\newthought{To get a C/C++ compiler}, we'll install either the MSVC 2015 Build 
-Tools\footnote{http://landinghub.visualstudio.com/visual-cpp-build-tools} or the MSVC 2017 Build
+\newthought{For our C/C++ compiler}, we'll install the MSVC 2017 Build
 Tools\footnote{https://www.visualstudio.com/downloads/\#build-tools-for-visual-studio-2017}.
-Note that if you already have Visual Studio 2015/17 installed, these will likely have already
+Note that if you already have Visual Studio 20/17 installed, these will likely have already
 been installed.  When installing, be sure to check the boxes to install the C++ compilers as well 
 as C++/CLI Support. \\ 
 
 \newthought{After the installation}, you should be able to navigate to the start menu and open both:
 \begin{itemize}
     
-    \item Developer Command Prompt for VS 2015/17
-    \item x64 Native Tools Command Prompt for VS 2015/17
+    \item Developer Command Prompt for VS 2017
+    \item x64 Native Tools Command Prompt for VS 2017
 
 \end{itemize}
 
@@ -126,7 +125,7 @@ from the URL to the right, making sure to download the *.zip. \\
     You may have to create this directory.}  This should result in a directory such as
     \Verb|C:\local\zlib-1.x.x|.
 
-    \newthought{To build} our libraries, open an ``x64 Native Tools Command Prompt for VS 2015/17''
+    \newthought{To build} our libraries, open an ``x64 Native Tools Command Prompt for VS 2017''
     from the start menu, and navigate to your zlib directory and execute the following 
     commands\footnote{Note that this guide uses \Verb|nmake| as its build tool, however cmake provides
     generators for several IDEs, see output of \Verb|cmake -h| for details.}:
@@ -157,7 +156,7 @@ from the URL to the right, making sure to download the *.zip. \\
 
     \newthought{After downloading}, extract the files to \Verb|C:\local\|.
 
-    \newthought{To build} libpng, either open an ``x64 Native Tools Command Prompt for VS 2015/17''
+    \newthought{To build} libpng, either open an ``x64 Native Tools Command Prompt for VS 2017''
     or use the existing Command Prompt from the previous step.  Navigate to the libpng directory:
     \Verb|C:\local\lpng1629\|, and execute:
 
@@ -185,7 +184,7 @@ from the URL to the right, making sure to download the *.zip. \\
     github\footnote{https://github.com/stohrendorf/libjpeg-cmake.git}.
 
     \newthought{To download and build}, execute the following in an ``x64 Native Tools Command
-    Prompt for VS 2015/17'' from \Verb|C:\local\|:
+    Prompt for VS 2017'' from \Verb|C:\local\|:
 
     \begin{lstlisting}
         git clone https://github.com/stohrendorf/libjpeg-cmake.git jpeg-9a
@@ -249,14 +248,13 @@ from the URL to the right, making sure to download the *.zip. \\
 
     \subsection{Header Fixing}
         
-        Changes in libpng / libjpeg have changed up what some header files are called.  In order
-        to compile correctly we need to ``spoof'' them.  We'll do this by symlinking their old
-        names to their new names.  Assuming we have our environment variables set up, simply 
-        execute the commands:
+        CMake modifies the filename of a library header for libpng, so we'll
+        create a symbolic link from the old filename to the true file.
+        Assuming we have our environment variables set up, simply execute the
+        commands:
 
         \begin{lstlisting}
             mklink %PNG_INCLUDE_DIR%\pnglibconf.h %PNG_INCLUDE_DIR%\scripts\pnglibconf.h.prebuilt
-
         \end{lstlisting}
 
     \subsection{Installation Proper}
@@ -276,7 +274,7 @@ from the URL to the right, making sure to download the *.zip. \\
                 -DOpenCV_DIR=%OPENCV_DIR% ^
                 -DTBB_ROOT_DIR=%TBB_ROOT_DIR% ^
                 -DTBB_LIBRARY=%TBB_LIBRARY% ^
-                -DTBB_INCLUDE_DIR=%TBB_INCLUDE% ^
+                -DTBB_INCLUDE_DIR=%TBB_INCLUDE_DIR% ^
                 -DZLIB_LIBRARY=%ZLIB_LIBRARY% ^
                 -DZLIB_INCLUDE_DIR=%ZLIB_INCLUDE_DIR% ^
                 -DPNG_PNG_INCLUDE_DIR=%PNG_INCLUDE_DIR% ^
@@ -290,7 +288,7 @@ from the URL to the right, making sure to download the *.zip. \\
 
     \newthought{Note} that the above commands assume that you've preserved the same Command
     Prompt that we defined the environment variables in.  Note also that you must perform this
-    compilation in an ``x64 Native Tools Command Prompt for VS 2015/17'', not a regular Developer
+    compilation in an ``x64 Native Tools Command Prompt for VS 2017'', not a regular Developer
     Command Prompt.
 
 \section{Running the Executables}
