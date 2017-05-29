@@ -102,9 +102,10 @@ for (at least) the your profile. \\
 
 \newthought{For our C/C++ compiler}, we'll install the MSVC 2017 Build
 Tools\footnote{https://www.visualstudio.com/downloads/\#build-tools-for-visual-studio-2017}.
-Note that if you already have Visual Studio 20/17 installed, these will likely have already
+Note that if you already have Visual Studio 2017 installed, these will likely have already
 been installed.  When installing, be sure to check the boxes to install the C++ compilers as well 
-as C++/CLI Support. \\ 
+as C++/CLI Support.\footnote{Note that you don't have install the full VS IDE, we just need the
+build tools which are found on the same website.} \\ 
 
 \newthought{After the installation}, you should be able to navigate to the start menu and open both:
 \begin{itemize}
@@ -113,6 +114,10 @@ as C++/CLI Support. \\
     \item x64 Native Tools Command Prompt for VS 2017
 
 \end{itemize}
+
+\newthought{For convenience}, keep a single ``x64 Native Tools Command Prompt for VS 2017`` open
+for the duration of the installation.  Depending on your setup, you may have to run it as 
+administrator.  This will allow us to set some environment variables to reduce typing.
 
 \section{Dependencies}
 
@@ -125,8 +130,7 @@ from the URL to the right, making sure to download the *.zip. \\
     You may have to create this directory.}  This should result in a directory such as
     \Verb|C:\local\zlib-1.x.x|.
 
-    \newthought{To build} our libraries, open an ``x64 Native Tools Command Prompt for VS 2017''
-    from the start menu, and navigate to your zlib directory and execute the following 
+    \newthought{To build}, navigate to your zlib directory and execute the following 
     commands\footnote{Note that this guide uses \Verb|nmake| as its build tool, however cmake provides
     generators for several IDEs, see output of \Verb|cmake -h| for details.}:
 
@@ -156,8 +160,7 @@ from the URL to the right, making sure to download the *.zip. \\
 
     \newthought{After downloading}, extract the files to \Verb|C:\local\|.
 
-    \newthought{To build} libpng, either open an ``x64 Native Tools Command Prompt for VS 2017''
-    or use the existing Command Prompt from the previous step.  Navigate to the libpng directory:
+    \newthought{To build}, navigate to the libpng directory:
     \Verb|C:\local\lpng1629\|, and execute:
 
     \begin{lstlisting}
@@ -183,8 +186,8 @@ from the URL to the right, making sure to download the *.zip. \\
     The final dependency we'll build, libjpeg,  is stored on 
     github\footnote{https://github.com/stohrendorf/libjpeg-cmake.git}.
 
-    \newthought{To download and build}, execute the following in an ``x64 Native Tools Command
-    Prompt for VS 2017'' from \Verb|C:\local\|:
+    \newthought{To download and build}, execute the following in the ongoing Command Prompt 
+    from \Verb|C:\local\|:
 
     \begin{lstlisting}
         git clone https://github.com/stohrendorf/libjpeg-cmake.git jpeg-9a
